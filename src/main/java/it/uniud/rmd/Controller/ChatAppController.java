@@ -13,19 +13,19 @@ import java.util.Objects;
 public class ChatAppController {
 
     /**
-     "@MessageMapping": si assicura che, se un messaggio viene inviato alla destinazione "/chat.tosend",
+     "@MessageMapping": si assicura che, se un messaggio viene inviato alla destinazione "/sendmessage",
      venga chiamato il metodo sendMessage().
      "SendTo": definisce la queue dove il messaggio verrà inoltrato.
      "/uniud": viene definito nelle config dal "enableSimpleBroker".
      */
-    @MessageMapping("/chat.tosend")
+    @MessageMapping("/sendMessage")
     @SendTo("/uniud/public")
     public ChatMessage sendMessage(@Payload ChatMessage message){
         return message;
     }
 
 
-    @MessageMapping("/chat.adduser")
+    @MessageMapping("/addUser")
     @SendTo("/uniud/public")
     public ChatMessage addUser(@Payload ChatMessage message, SimpMessageHeaderAccessor headerAccessor){
 
