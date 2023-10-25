@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>UniUd chat</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <script src="/js/app.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
+</head>
+<body>
+    <div id="user-page">
+        <div class="user-page-container">
+            <h1 class="title">Inserisci il tuo nome</h1>
+            <form id="usernameForm" name="usernameForm">
+                <div class="form-group">
+                    <input type="text" id="name" placeholder="il tuo nome" autocomplete="off" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="accent username-submit">Inizia a chattare!</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="chat-page" class="hidden">
+        <div class="chat-container">
+            <div class="chat-header">
+                <h2>UniUd Chat</h2>
+            </div>
+            <div class="connecting">
+                Connessione...
+            </div>
+            <ul id="message-area">
+
+            </ul>
+            <form id="message-form" name="messageForm">
+                <div class="form-group">
+                    <div class="input-group clearfix">
+                        <input type="text" id="message" placeholder="Scrivi qualcosa..." autocomplete="off" class="form-control"/>
+                        <button type="submit" class="primary">Send</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+<noscript>
+    <h2 style="color: #ff0000">
+        Sembra che il tuo browser non supporti Javascript! Websocket deve avere Javascript abilitato per funzionare.
+        Per favore abilita Javascript e ricarica questa pagina!
+    </h2>
+</noscript>
+
+</body>
+</html>
