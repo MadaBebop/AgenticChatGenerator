@@ -10,6 +10,12 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocket implements WebSocketMessageBrokerConfigurer {
 
+    /*  LINKS:
+        endpoint: "/wss"
+        AppPrefix: "/app"
+        Broker: "/uniud"
+    */
+
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         //Endpoint della connessione

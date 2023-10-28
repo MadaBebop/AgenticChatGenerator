@@ -1,16 +1,14 @@
 package it.uniud.rmd.Chat;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+@Setter
+@Getter
 public class ChatMessage {
-    private String message;
+    private String content;
     private String sender;
     private MessageType type;
 }

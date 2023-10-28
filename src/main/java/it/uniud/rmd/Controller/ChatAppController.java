@@ -6,11 +6,19 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.Objects;
 
+//Mappato di default "/"
 @Controller
 public class ChatAppController {
+
+    //Ritorna la pagina della chat: "home.html"
+    @GetMapping("/")
+    public String getHome() {
+        return "home";
+    }
 
     /**
      "@MessageMapping": si assicura che, se un messaggio viene inviato alla destinazione "/sendmessage",
@@ -18,18 +26,18 @@ public class ChatAppController {
      "SendTo": definisce la queue dove il messaggio verrà inoltrato.
      "/uniud": viene definito nelle config dal "enableSimpleBroker".
      */
-    @MessageMapping("/sendMessage")
+    @MessageMapping("/sendmessage")
     @SendTo("/uniud/public")
     public ChatMessage sendMessage(@Payload ChatMessage message){
         return message;
     }
 
 
-    @MessageMapping("/addUser")
+    @MessageMapping("/adduser")
     @SendTo("/uniud/public")
     public ChatMessage addUser(@Payload ChatMessage message, SimpMessageHeaderAccessor headerAccessor){
 
-        //Aggiungiamo lo username del ChatMessage nel canale WS : mappato con "username"
+        //Aggiungiamo lo username del ChatMessage nel canale WS: mappato con "username"
         Objects.requireNonNull(headerAccessor.getSessionAttributes()).put("username", message.getSender());
         return message;
     }

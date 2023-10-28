@@ -30,8 +30,9 @@ public class EventListenerConfig {
         String username = (String) Objects.requireNonNull(headerAccessor.getSessionAttributes()).get("username");
 
         if(username != null){
-            System.out.println("User disconnected");
-            //Creaimo il messaggio di disconnessione dell'utente
+            //Messaggio di notifica di disconnessione dell'utente
+            System.out.println(username + " disconnected.");
+
             ChatMessage chatMessage = ChatMessage.builder()
                     .type(MessageType.LEAVE)
                     .sender(username)
