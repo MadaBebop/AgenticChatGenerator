@@ -49,7 +49,7 @@ function onConnected() {
     // Sottoscrive al canale pubblico "/uniud"
     stompEndpoint.subscribe('/uniud/public', onMessageReceived);
 
-    // ApplicationDestinationPrefix + message mapping ("adduser") del metodo 'sendMessage'
+    // ApplicationDestinationPrefix + message mapping ("adduser") = aggiungo utente alla chat con status 'JOIN'
     stompEndpoint.send(
         "/app/adduser",
         {},
@@ -89,7 +89,7 @@ function sendMessage(event) {
     event.preventDefault();
 }
 
-
+//Metodo usato nella onConnected
 function onMessageReceived(payload) {
 
     //Creiamo un elemento html tipo lista (linea messaggio chat)

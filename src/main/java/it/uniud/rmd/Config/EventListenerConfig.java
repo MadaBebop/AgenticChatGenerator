@@ -19,7 +19,6 @@ public class EventListenerConfig {
 
     /*
         Questo metodo-listener informa quando uno user esce dalla chat testuale.
-
      */
     @EventListener
     public void disconnectListeners(SessionDisconnectEvent disconnectEvent) {
@@ -38,6 +37,7 @@ public class EventListenerConfig {
                     .sender(username)
                     .build();
 
+            //Invio dell'utente: con "status" disconnesso
             messageSendingOperation.convertAndSend("/uniud/public", chatMessage);
         }else{
             System.out.println("Username incognito");

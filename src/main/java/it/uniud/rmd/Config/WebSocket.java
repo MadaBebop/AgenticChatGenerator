@@ -9,7 +9,6 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocket implements WebSocketMessageBrokerConfigurer {
-
     /*  LINKS:
         endpoint: "/wss"
         AppPrefix: "/app"

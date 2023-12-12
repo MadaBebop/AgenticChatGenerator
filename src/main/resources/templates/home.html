@@ -2,8 +2,8 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
-    <title>UniUd chat</title>
-    <link rel="stylesheet" href="/css/home.css">
+    <title>Università di Udine chat</title>
+    <link href="/css/chat.css" rel="stylesheet">
 </head>
 
 <body>
@@ -24,7 +24,7 @@
     <div id="chat-page" class="hidden">
         <div class="chat-container">
             <div class="chat-header">
-                <h2>UniUd Chat</h2>
+                <h2>Uni Udine Chat</h2>
             </div>
             <div class="connecting">  <!-- Verrà poi inserito il nome   -->
                 Connessione...
@@ -36,23 +36,27 @@
                 <div class="form-group">
                     <div class="input-group clearfix">
                         <input type="text" id="message" placeholder="Scrivi qualcosa..." autocomplete="off" class="form-control"/>
-                        <button type="submit" class="primary">Send</button>
+                        <button class="primary" type="submit">Invia</button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
 
+    <noscript>
+        <h2 style="color: #ff0000">
+         Sembra che il tuo browser non supporti Javascript! Websocket deve avere Javascript abilitato per funzionare.
+         Per favore abilita Javascript e ricarica questa pagina!
+        </h2>
+    </noscript>
 
-<noscript>
-    <h2 style="color: #ff0000">
-        Sembra che il tuo browser non supporti Javascript! Websocket deve avere Javascript abilitato per funzionare.
-        Per favore abilita Javascript e ricarica questa pagina!
-    </h2>
-</noscript>
-
+    <!-- my script -->
     <script src="/js/app.js"></script>
+
+    <!-- Librerie Js: stomp, sock-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <!--GitHub sockjs: https://github.com/sockjs/sockjs-client?utm_source=cdnjs&utm_medium=cdnjs_link&utm_campaign=cdnjs_library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <!--GitHub stompjs: https://github.com/jmesnil/stomp-websocket?utm_source=cdnjs&utm_medium=cdnjs_link&utm_campaign=cdnjs_library -->
 </body>
 </html>

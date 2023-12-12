@@ -20,7 +20,7 @@ public class ChatAppController {
         return "home";
     }
 
-    /**
+    /*
      "@MessageMapping": si assicura che, se un messaggio viene inviato alla destinazione "/sendmessage",
      venga chiamato il metodo sendMessage().
      "SendTo": definisce la queue dove il messaggio verrà inoltrato.
@@ -32,12 +32,10 @@ public class ChatAppController {
         return message;
     }
 
-
     @MessageMapping("/adduser")
     @SendTo("/uniud/public")
     public ChatMessage addUser(@Payload ChatMessage message, SimpMessageHeaderAccessor headerAccessor){
-
-        //Aggiungiamo lo username del ChatMessage nel canale WS: mappato con "username"
+        //Aggiungiamo lo username del ChatMessage nel canale websocket: mappato con "username"
         Objects.requireNonNull(headerAccessor.getSessionAttributes()).put("username", message.getSender());
         return message;
     }
