@@ -27,5 +27,4 @@ public class WebSocket implements WebSocketMessageBrokerConfigurer {
         registry.setApplicationDestinationPrefixes("/app");
         registry.enableSimpleBroker("/uniud");
     }
-
 }

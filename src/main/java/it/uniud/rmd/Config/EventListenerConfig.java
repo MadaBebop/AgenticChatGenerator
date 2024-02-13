@@ -12,24 +12,22 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import java.util.Objects;
 
 @Component
-@RequiredArgsConstructor
+@RequiredArgsConstructor //final constructor
 public class EventListenerConfig {
 
     private final SimpMessageSendingOperations messageSendingOperation;
 
-    /*
-        Questo metodo-listener informa quando uno user esce dalla chat testuale.
-     */
+
+    //Questo metodo-listener informa quando uno user esce dalla chat testuale.
     @EventListener
     public void disconnectListeners(SessionDisconnectEvent disconnectEvent) {
-
         //Lo stompHeaderAccessor prenderà le informazioni riguardo a chi si è disconnesso
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(disconnectEvent.getMessage());
         //Username disconnesso, -> throws NullPointerException
         String username = (String) Objects.requireNonNull(headerAccessor.getSessionAttributes()).get("username");
 
         if(username != null){
-            //Messaggio di notifica di disconnessione dell'utente
+            //Notifica a console di disconnessione dell'utente
             System.out.println(username + " disconnected.");
 
             ChatMessage chatMessage = ChatMessage.builder()
