@@ -1,6 +1,8 @@
 package it.uniud.rmd.Controller;
 
 import it.uniud.rmd.Chat.ChatMessage;
+import it.uniud.rmd.Service.OpenAiService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -35,7 +37,10 @@ public class ChatAppController {
      */
     @MessageMapping("/sendmessage")
     @SendTo("/uniud/public")
-    public ChatMessage sendMessage(@Payload ChatMessage message){
+    public ChatMessage sendMessage (@Payload ChatMessage message){
+        //Controllo comando bot
+        openAiService.openAiCheck(message.getContent());
+
         return message;
     }
 
