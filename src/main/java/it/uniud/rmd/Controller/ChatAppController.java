@@ -14,6 +14,13 @@ import java.util.Objects;
 @Controller
 public class ChatAppController {
 
+    private final OpenAiService openAiService;
+
+    @Autowired
+    public ChatAppController(OpenAiService openAiService) {
+        this.openAiService = openAiService;
+    }
+
     //Ritorna la pagina della chat: "home.html"
     @GetMapping("/")
     public String getHome() {
@@ -38,5 +45,7 @@ public class ChatAppController {
         //Aggiungiamo lo username del ChatMessage nel canale websocket: mappato con "username"
         Objects.requireNonNull(headerAccessor.getSessionAttributes()).put("username", message.getSender());
         return message;
+
+        //Sarà necessario rendere noti i bot? (Unirli alla chat?)
     }
 }

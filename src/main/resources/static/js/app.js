@@ -78,7 +78,7 @@ function sendMessage(event) {
     if(messageContent && stompEndpoint) {
         let message = {
             sender: username,
-            content: messageInput.value,
+            content: messageContent,
             type: 'CHAT'
         };
 
@@ -141,7 +141,7 @@ function onMessageReceived(payload) {
 
 //----------------------------------------------------------------------------------------------------------------------
 function stringToColor(seed) {
-    // Calcola un hash univoco basato su una stringa di input
+    // Calcola un hash univoco basato su una stringa di input (nel nostro caso il nome della persona in chat)
     let hashCode = 0;
     for (let i = 0; i < seed.length; i++) {
         hashCode = seed.charCodeAt(i) + ((hashCode << 5) - hashCode);

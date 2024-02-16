@@ -1,6 +1,6 @@
 package it.uniud.rmd.Chat;
 
-
+import it.uniud.rmd.Chat.MessageType;
 import lombok.*;
 
 @Builder

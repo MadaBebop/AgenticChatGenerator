@@ -8,7 +8,6 @@ import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
-
 import java.util.Objects;
 
 @Component
@@ -27,7 +26,7 @@ public class EventListenerConfig {
         String username = (String) Objects.requireNonNull(headerAccessor.getSessionAttributes()).get("username");
 
         if(username != null){
-            //Notifica a console di disconnessione dell'utente
+            //Notifica in console di disconnessione dell'utente
             System.out.println(username + " disconnected.");
 
             ChatMessage chatMessage = ChatMessage.builder()
