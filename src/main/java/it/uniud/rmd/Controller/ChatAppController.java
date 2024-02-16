@@ -1,6 +1,6 @@
 package it.uniud.rmd.Controller;
 
-import it.uniud.rmd.Chat.ChatMessage;
+import it.uniud.rmd.Chat.*;
 import it.uniud.rmd.Service.OpenAiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -38,8 +38,17 @@ public class ChatAppController {
     @MessageMapping("/sendmessage")
     @SendTo("/uniud/public")
     public ChatMessage sendMessage (@Payload ChatMessage message){
-        //Controllo comando bot
-        openAiService.openAiCheck(message.getContent());
+        //Controllo esistenza comando "!bot"
+        if(openAiService.openAiCheck(message.getContent())) {
+            //Prendiamo la risposta del bot inviandogli il nostro mex
+            String rispostaBot = openAiService.sendAiMessage(message.getContent());
+            return new ChatMessage(
+                    rispostaBot,
+                    "OpenAiBot",
+                    MessageType.CHAT
+            );
+            //NB Dobbiamo inviare il messaggio di risposta in una seconda sessione. In questa dobbiamo far vedere la domanda.
+        }
 
         return message;
     }
