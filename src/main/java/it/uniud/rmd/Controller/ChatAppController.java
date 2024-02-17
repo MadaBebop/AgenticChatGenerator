@@ -7,20 +7,24 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.Objects;
+import java.util.concurrent.Executors;
 
 //Mappato di default "/"
 @Controller
 public class ChatAppController {
 
     private final OpenAiService openAiService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Autowired
-    public ChatAppController(OpenAiService openAiService) {
+    public ChatAppController(OpenAiService openAiService, SimpMessagingTemplate messagingTemplate) {
         this.openAiService = openAiService;
+        this.messagingTemplate = messagingTemplate;
     }
 
     //Ritorna la pagina della chat: "home.html"
@@ -40,16 +44,9 @@ public class ChatAppController {
     public ChatMessage sendMessage (@Payload ChatMessage message){
         //Controllo esistenza comando "!bot"
         if(openAiService.openAiCheck(message.getContent())) {
-            //Prendiamo la risposta del bot inviandogli il nostro mex
-            String rispostaBot = openAiService.sendAiMessage(message.getContent());
-            return new ChatMessage(
-                    rispostaBot,
-                    "OpenAiBot",
-                    MessageType.CHAT
-            );
-            //NB Dobbiamo inviare il messaggio di risposta in una seconda sessione. In questa dobbiamo far vedere la domanda.
+            //avvio un thread secondario asincrono
+            Executors.newSingleThreadExecutor().execute(() -> openAiService.elaboraComandoBot(message));
         }
-
         return message;
     }
 

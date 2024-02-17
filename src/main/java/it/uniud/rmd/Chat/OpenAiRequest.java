@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 @Setter
 public class OpenAiRequest {
-    private final String model;
+    private String model;
     private List<OpenAiMessage> messages;
 
     public OpenAiRequest(String model, String prompt) {

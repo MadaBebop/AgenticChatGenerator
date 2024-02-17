@@ -8,7 +8,8 @@ import lombok.*;
 @Setter
 @Getter
 public class ChatMessage {
-    private String content;
-    private String sender;
-    private MessageType type;
-}
+        private String content;
+        private String sender;
+        private MessageType type;
+    }
+
