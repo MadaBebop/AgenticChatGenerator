@@ -7,18 +7,17 @@ import it.uniud.rmd.Chat.OpenAiResponse;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Service
 public class OpenAiService {
 
-    @Value("${openai.api.key}")
-    private String openAiApiKey;
     @Value("${openai.model}")
     private String model;
     @Value("${openai.api.url}")
@@ -28,47 +27,66 @@ public class OpenAiService {
     private RestTemplate restTemplate;
     private final SimpMessagingTemplate messagingTemplate;
 
-    //lastchatactivitytimestamp tiene traccia dell'inutilizzo della chat
+    //AtomicLong tiene traccia delle modifiche apportate alla variabile anche in contesto di multi threading
+    private static final long TIMEOUT_SECONDS = 10;
     private volatile long lastChatActivityTimestamp;
-    private final ScheduledExecutorService scheduler;
+    private volatile boolean isChatActive;
 
-    public OpenAiService(SimpMessagingTemplate messagingTemplate, RestTemplate restTemplate) {
+    //Thread per la chat dei bot
+    ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+
+    public OpenAiService(SimpMessagingTemplate messagingTemplate, RestTemplate restTemplate){
         this.messagingTemplate = messagingTemplate;
         this.restTemplate = restTemplate;
 
         //Timestamp chat initialization
-        this.lastChatActivityTimestamp = System.currentTimeMillis(); //First Timestamp
-        this.scheduler = Executors.newSingleThreadScheduledExecutor();
-        startInactivityCheck();
+        lastChatActivityTimestamp = System.currentTimeMillis();//First Timestamp
+        isChatActive= true;
     }
 
-    public void startInactivityCheck() {
-        scheduler.scheduleAtFixedRate(() -> {
-            long currentTime = System.currentTimeMillis();
-            long inactiveDuration = currentTime - lastChatActivityTimestamp;
 
-            if (inactiveDuration > 20000) { // 20 secondi in millisecondi
-                // Invia il messaggio di sistema
-                System.out.println("OpenAiService.startInactivityCheck");
-            }
-        }, 1, 2, TimeUnit.SECONDS);
+    @Scheduled(fixedRate = 1000)
+    public void checkChatStatus() {
+        long currentTime = System.currentTimeMillis();
+        long idleTime = currentTime - lastChatActivityTimestamp;
+
+        if (idleTime >= TimeUnit.SECONDS.toMillis(TIMEOUT_SECONDS)) {
+            // La chat è inattiva da più di tot secondi, avvia la chat tra bot
+            startChattingWithBots(false);
+            //TODO: da migliorare la creazione del thread. Problema: si entra in un loop nel quale l'if ripete la creazione del thread.
+            executorService.execute(this::chattingBetweenBots);
+        }
     }
 
     public void updateLastChatActivity() {
         lastChatActivityTimestamp = System.currentTimeMillis();
     }
 
-    //Funzione di controllo del messaggio utente, se contiene il comando "!bot"
-    public boolean openAiCheck(String message) {
-            // Controllo "!bot"
-            if(message.toLowerCase().startsWith("!bot")) {
-                //Mi metto in moto per usare chat gpt
-                System.out.println("OpenAiService.openAiCheck c'è!");
-                return true;
-            }
-        return false;
+
+    public void chattingBetweenBots () {
+        String botText = "Inizia una conversazione a tuo piacere, l'altro tuo interlocutore è un bot come te.";
+        boolean alternateBotId = true;//Booleano che identifica il bot 1 (true) e il bot 2 (false)
+
+        while(!isChatActive){
+            String botId = alternateBotId ? "Vortex" : "Pulsar";
+            elaborateAnswareBot(new ChatMessage(botText,botId , MessageType.CHAT));
+            botText = sendAiMessage(botText);
+            alternateBotId=(!alternateBotId);
+        }
     }
 
+    public void startChattingWithBots(boolean isActive){
+        isChatActive = isActive;
+    }
+
+    //Funzione di controllo del messaggio utente, se contiene il comando "!bot"
+    public boolean openAiCheck(String message) {
+        // Controllo se viene usato il comando "!bot"
+        return message.toLowerCase().startsWith("!bot");
+    }
+
+    //Invio una richiesta api al bot di chat gpt, mi aspetto una sua risposta
     public String sendAiMessage(String messaggio) {
         OpenAiRequest request = new OpenAiRequest(model, messaggio);
         System.out.println("Generato il messaggio");
@@ -78,24 +96,48 @@ public class OpenAiService {
                 OpenAiResponse.class);
         System.out.println("inviato la richiesta");
         if (response == null || response.getChoices() == null || response.getChoices().isEmpty()) {
-            return "Nessuna risposta";
+            return "Nessuna risposta, il bot potrebbe essere occupato :(";
         }
-        System.out.println("ritorno");
+        System.out.println("ritorna la risposta");
         return response.getChoices().get(0).getMessage().getContent();
     }
 
-    public void elaborateBotCommand(ChatMessage messageToElaborate) {
+    //Invia il messaggio di risposta del bot nella web chat
+    public void elaborateAnswareBot(ChatMessage messageToElaborate) {
         String rispostaBot = sendAiMessage(messageToElaborate.getContent());
         messagingTemplate.convertAndSend("/uniud/public", new ChatMessage(
                 rispostaBot,
-                "OpenAiBot",
+                messageToElaborate.getSender(),
                 MessageType.CHAT)
         );
     }
 
-    //Controllo se la chat non viene utilizzata da tempo
-    public boolean checkChatStatus (){
-        return true;
+    public void notifyBotsEnteringChatRoom(){
+        //Notifichiamo la presenza dei due bot in chat.
+        messagingTemplate.convertAndSend("/uniud/public", new ChatMessage(
+                "",
+                "Vortex",
+                MessageType.JOIN
+        ));
+        messagingTemplate.convertAndSend("/uniud/public", new ChatMessage(
+                "",
+                "Pulsar",
+                MessageType.JOIN
+        ));
+    }
+
+    public void notifyBotsLeavingChatRoom(){
+        //Notifichiamo l'uscita dei due bot dalla chat.
+        messagingTemplate.convertAndSend("/uniud/public", new ChatMessage(
+                "Bye!",
+                "Vortex",
+                MessageType.LEAVE
+        ));
+        messagingTemplate.convertAndSend("/uniud/public", new ChatMessage(
+                "Bye!",
+                "Pulsar",
+                MessageType.LEAVE
+        ));
     }
 }
 

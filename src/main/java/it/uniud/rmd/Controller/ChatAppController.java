@@ -7,7 +7,6 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -19,12 +18,10 @@ import java.util.concurrent.Executors;
 public class ChatAppController {
 
     private final OpenAiService openAiService;
-    private final SimpMessagingTemplate messagingTemplate;
 
     @Autowired
-    public ChatAppController(OpenAiService openAiService, SimpMessagingTemplate messagingTemplate) {
+    public ChatAppController(OpenAiService openAiService) {
         this.openAiService = openAiService;
-        this.messagingTemplate = messagingTemplate;
     }
 
     //Ritorna la pagina della chat: "home.html"
@@ -45,11 +42,18 @@ public class ChatAppController {
         //Controllo esistenza comando "!bot"
         if(openAiService.openAiCheck(message.getContent())) {
             //avvio un thread secondario asincrono
-            Executors.newSingleThreadExecutor().execute(() -> openAiService.elaborateBotCommand(message));
+            Executors.newSingleThreadExecutor().execute(() ->
+                    openAiService.elaborateAnswareBot(new ChatMessage(
+                            message.getContent(),
+                            "OpenAiBot",
+                            MessageType.CHAT)
+                    ));
+        }else {
+            //Aggiornamento ultimo messaggio inviato in chat, SOLO se non è di un bot
+            openAiService.updateLastChatActivity();
+            openAiService.startChattingWithBots(true);
+            System.out.println("Aggiornamento del timer inattività");
         }
-
-        //Aggiornamento ultimo messaggio inviato in chat
-        openAiService.updateLastChatActivity();
 
         return message;
     }
@@ -60,7 +64,5 @@ public class ChatAppController {
         //Aggiungiamo lo username del ChatMessage nel canale websocket: mappato con "username"
         Objects.requireNonNull(headerAccessor.getSessionAttributes()).put("username", message.getSender());
         return message;
-
-        //Sarà necessario rendere noti i bot? (Unirli alla chat?)
     }
 }
