@@ -45,8 +45,12 @@ public class ChatAppController {
         //Controllo esistenza comando "!bot"
         if(openAiService.openAiCheck(message.getContent())) {
             //avvio un thread secondario asincrono
-            Executors.newSingleThreadExecutor().execute(() -> openAiService.elaboraComandoBot(message));
+            Executors.newSingleThreadExecutor().execute(() -> openAiService.elaborateBotCommand(message));
         }
+
+        //Aggiornamento ultimo messaggio inviato in chat
+        openAiService.updateLastChatActivity();
+
         return message;
     }
 
