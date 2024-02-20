@@ -28,14 +28,14 @@ public class OpenAiService {
     private final SimpMessagingTemplate messagingTemplate;
 
     //AtomicLong tiene traccia delle modifiche apportate alla variabile anche in contesto di multi threading
-    private static final long TIMEOUT_SECONDS = 10;
+    private static final long TIMEOUT_SECONDS = 30;
     private volatile long lastChatActivityTimestamp;
     private volatile boolean isChatActive;
 
     //Thread per la chat dei bot
     ExecutorService executorService = Executors.newSingleThreadExecutor();
 
-
+    //Costruttore
     public OpenAiService(SimpMessagingTemplate messagingTemplate, RestTemplate restTemplate){
         this.messagingTemplate = messagingTemplate;
         this.restTemplate = restTemplate;
@@ -46,14 +46,14 @@ public class OpenAiService {
     }
 
 
-    @Scheduled(fixedRate = 1000)
+    @Scheduled(fixedRate = 2000)
     public void checkChatStatus() {
         long currentTime = System.currentTimeMillis();
         long idleTime = currentTime - lastChatActivityTimestamp;
 
         if (idleTime >= TimeUnit.SECONDS.toMillis(TIMEOUT_SECONDS)) {
             // La chat è inattiva da più di tot secondi, avvia la chat tra bot
-            startChattingWithBots(false);
+            isChatActive(false);
             //TODO: da migliorare la creazione del thread. Problema: si entra in un loop nel quale l'if ripete la creazione del thread.
             executorService.execute(this::chattingBetweenBots);
         }
@@ -64,8 +64,8 @@ public class OpenAiService {
     }
 
 
-    public void chattingBetweenBots () {
-        String botText = "Inizia una conversazione a tuo piacere, l'altro tuo interlocutore è un bot come te.";
+    public void chattingBetweenBots (){
+        String botText = "Inizia una conversazione su un tuo argomento a piacere.";
         boolean alternateBotId = true;//Booleano che identifica il bot 1 (true) e il bot 2 (false)
 
         while(!isChatActive){
@@ -73,11 +73,16 @@ public class OpenAiService {
             elaborateAnswareBot(new ChatMessage(botText,botId , MessageType.CHAT));
             botText = sendAiMessage(botText);
             alternateBotId=(!alternateBotId);
+            try {
+                Thread.sleep(2500);
+            }catch (InterruptedException ignored){
+                System.out.println("chattingBetweenBots IE error");
+            }
         }
     }
 
-    public void startChattingWithBots(boolean isActive){
-        isChatActive = isActive;
+    public void isChatActive(boolean status){
+        isChatActive = status;
     }
 
     //Funzione di controllo del messaggio utente, se contiene il comando "!bot"
@@ -90,16 +95,20 @@ public class OpenAiService {
     public String sendAiMessage(String messaggio) {
         OpenAiRequest request = new OpenAiRequest(model, messaggio);
         System.out.println("Generato il messaggio");
-        OpenAiResponse response = restTemplate.postForObject(
-                apiUrl,
-                request,
-                OpenAiResponse.class);
-        System.out.println("inviato la richiesta");
-        if (response == null || response.getChoices() == null || response.getChoices().isEmpty()) {
+        try {
+            OpenAiResponse response = restTemplate.postForObject(
+                    apiUrl,
+                    request,
+                    OpenAiResponse.class);
+
+    if(response == null || response.getChoices() == null || response.getChoices().isEmpty()) {
             return "Nessuna risposta, il bot potrebbe essere occupato :(";
         }
-        System.out.println("ritorna la risposta");
         return response.getChoices().get(0).getMessage().getContent();
+        }catch(Exception e) {
+            System.out.println("é stato impossibile accedere all'api");
+        }
+        return "failed request";
     }
 
     //Invia il messaggio di risposta del bot nella web chat

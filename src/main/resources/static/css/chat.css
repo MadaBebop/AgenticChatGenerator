@@ -126,14 +126,14 @@ button:hover{
 }
 
 .chat-container {
-    max-width: 700px;
+    max-width: 800px;
     margin-left: auto;
     margin-right: auto;
     background-color: #fff;
     box-shadow: 0 1px 11px rgba(0, 0, 0, 0.27);
     margin-top: 30px;
     height: calc(100% - 60px);
-    max-height: 600px;
+    max-height: 900px;
     position: relative;
 }
 
@@ -249,7 +249,9 @@ button:hover{
 /* cambio stile in base alla schermata*/
 @media screen and (max-width: 480px) {
     .chat-container {
-        height: calc(100% - 30px);
+        width: 50px;
+        height: auto;
+        border: 1px solid #ccc;
     }
 
     .user-page-container {

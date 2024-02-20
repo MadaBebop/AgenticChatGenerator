@@ -48,12 +48,11 @@ public class ChatAppController {
                             "OpenAiBot",
                             MessageType.CHAT)
                     ));
-        }else {
-            //Aggiornamento ultimo messaggio inviato in chat, SOLO se non è di un bot
-            openAiService.updateLastChatActivity();
-            openAiService.startChattingWithBots(true);
-            System.out.println("Aggiornamento del timer inattività");
         }
+        //Aggiornamento status chat dall'ultimo messaggio inviato
+        openAiService.updateLastChatActivity();
+        System.out.println("Aggiornamento del timer inattività");
+        openAiService.isChatActive(true);
 
         return message;
     }
