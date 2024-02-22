@@ -1,4 +1,4 @@
-package it.uniud.rmd.Chat;
+package it.uniud.rmd.DTO;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -9,6 +9,7 @@ import java.util.List;
 @Setter
 public class OpenAiResponse {
     private List<Choice> choices;
+
 
     @Getter
     @Setter

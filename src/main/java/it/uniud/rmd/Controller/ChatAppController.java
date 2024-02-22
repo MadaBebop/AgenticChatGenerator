@@ -1,6 +1,6 @@
 package it.uniud.rmd.Controller;
 
-import it.uniud.rmd.Chat.*;
+import it.uniud.rmd.DTO.*;
 import it.uniud.rmd.Service.OpenAiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -39,20 +39,23 @@ public class ChatAppController {
     @MessageMapping("/sendmessage")
     @SendTo("/uniud/public")
     public ChatMessage sendMessage (@Payload ChatMessage message){
+        //Aggiornamento status attività chat
+        openAiService.updateLastChatActivity();
+        System.out.println("Aggiornamento del timer inattività");
+
         //Controllo esistenza comando "!bot"
         if(openAiService.openAiCheck(message.getContent())) {
             //avvio un thread secondario asincrono
             Executors.newSingleThreadExecutor().execute(() ->
-                    openAiService.elaborateAnswareBot(new ChatMessage(
-                            message.getContent(),
-                            "OpenAiBot",
-                            MessageType.CHAT)
-                    ));
+                    openAiService.newChatMessage(
+                            new ChatMessage(
+                                    message.getContent(),
+                                    "OpenAiBot",
+                                    MessageType.CHAT
+                            )
+                    )
+            );
         }
-        //Aggiornamento status chat dall'ultimo messaggio inviato
-        openAiService.updateLastChatActivity();
-        System.out.println("Aggiornamento del timer inattività");
-        openAiService.isChatActive(true);
 
         return message;
     }

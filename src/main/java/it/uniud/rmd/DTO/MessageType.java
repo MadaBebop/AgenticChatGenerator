@@ -1,4 +1,4 @@
-package it.uniud.rmd.Chat;
+package it.uniud.rmd.DTO;
 
 public enum MessageType {
     JOIN,

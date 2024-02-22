@@ -1,7 +1,7 @@
 package it.uniud.rmd.Config;
 
-import it.uniud.rmd.Chat.ChatMessage;
-import it.uniud.rmd.Chat.MessageType;
+import it.uniud.rmd.DTO.ChatMessage;
+import it.uniud.rmd.DTO.MessageType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
