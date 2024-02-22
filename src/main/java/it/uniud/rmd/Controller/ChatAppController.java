@@ -39,6 +39,10 @@ public class ChatAppController {
     @MessageMapping("/sendmessage")
     @SendTo("/uniud/public")
     public ChatMessage sendMessage (@Payload ChatMessage message){
+        //Aggiornamento status attività chat
+        openAiService.updateLastChatActivity();
+        System.out.println("Aggiornamento del timer inattività");
+
         //Controllo esistenza comando "!bot"
         if(openAiService.openAiCheck(message.getContent())) {
             //avvio un thread secondario asincrono
@@ -49,10 +53,6 @@ public class ChatAppController {
                             MessageType.CHAT)
                     ));
         }
-        //Aggiornamento status chat dall'ultimo messaggio inviato
-        openAiService.updateLastChatActivity();
-        System.out.println("Aggiornamento del timer inattività");
-        openAiService.isChatActive(true);
 
         return message;
     }
