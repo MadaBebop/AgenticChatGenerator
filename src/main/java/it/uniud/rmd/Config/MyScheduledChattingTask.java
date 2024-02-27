@@ -10,18 +10,19 @@ import java.util.concurrent.ScheduledExecutorService;
 @Component
 public class MyScheduledChattingTask{
 
-    private final OpenAiService service;
+
+    private final OpenAiService openAiService;
     private final ScheduledExecutorService scheduledExecutorService;
 
-    public MyScheduledChattingTask(OpenAiService service, ScheduledExecutorService scheduledExecutorService) {
-        this.service = service;
+    public MyScheduledChattingTask(OpenAiService openAiService, ScheduledExecutorService scheduledExecutorService) {
+        this.openAiService = openAiService;
         this.scheduledExecutorService = scheduledExecutorService;
     }
 
     @Scheduled(fixedDelay = 5000)
     public void myTask() {
-        if (service.isChatInactive()) {
-            scheduledExecutorService.execute(service::chattingBetweenBots);
+        if (openAiService.isChatInactive()) {
+            scheduledExecutorService.execute(openAiService::chattingBetweenBots);
         }
     }
 

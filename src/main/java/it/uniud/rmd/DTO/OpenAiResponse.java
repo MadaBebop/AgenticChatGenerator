@@ -10,7 +10,6 @@ import java.util.List;
 public class OpenAiResponse {
     private List<Choice> choices;
 
-
     @Getter
     @Setter
     public static class Choice {
