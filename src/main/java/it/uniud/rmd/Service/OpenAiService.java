@@ -1,9 +1,7 @@
 package it.uniud.rmd.Service;
 
-import it.uniud.rmd.Chat.ChatMessage;
-import it.uniud.rmd.Chat.MessageType;
+
 import it.uniud.rmd.Chat.OpenAiRequest;
-import it.uniud.rmd.Chat.OpenAiResponse;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
