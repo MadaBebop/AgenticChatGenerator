@@ -77,9 +77,7 @@ public class OpenAiService{
                         MessageType.CHAT
                 ));
 
-                //Aggiungo la risposta di pulsar alla conversazione di vortex
                 conversationVortex.add(new OpenAiMessage("assistant", response));
-                //Aggiungo
                 conversationPulsar.add(new OpenAiMessage("user", response));
             }else if(conversationTurn.equals("pulsar")){
                 String response = sendApiRequest(conversationPulsar);
@@ -91,14 +89,14 @@ public class OpenAiService{
                 ));
 
                 conversationPulsar.add(new OpenAiMessage("assistant", response));
-                conversationPulsar.add(new OpenAiMessage("user", response));
+                conversationVortex.add(new OpenAiMessage("user", response));
             }
 
             conversationAlternation = !conversationAlternation;
 
             //Awaits few secs
             try {
-                Thread.sleep(2000);
+                Thread.sleep(3000);
             }catch (InterruptedException ignored){
                 System.out.println("chattingBetweenBots IE error");
             }
