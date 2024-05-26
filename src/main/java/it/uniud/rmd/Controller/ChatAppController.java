@@ -1,7 +1,7 @@
 package it.uniud.rmd.Controller;
 
 import it.uniud.rmd.DTO.*;
-import it.uniud.rmd.Service.OpenAiService;
+import it.uniud.rmd.Service.ChatAiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -10,6 +10,8 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Executors;
 
@@ -17,11 +19,11 @@ import java.util.concurrent.Executors;
 @Controller
 public class ChatAppController {
 
-    private final OpenAiService openAiService;
+    private final ChatAiService chatAiService;
 
     @Autowired
-    public ChatAppController(OpenAiService openAiService) {
-        this.openAiService = openAiService;
+    public ChatAppController(ChatAiService chatAiService) {
+        this.chatAiService = chatAiService;
     }
 
     //Ritorna la pagina della chat: "home.html"
@@ -40,16 +42,26 @@ public class ChatAppController {
     @SendTo("/uniud/public")
     public ChatMessage sendMessage (@Payload ChatMessage message){
         //Aggiornamento status attività chat
-        openAiService.updateLastChatActivity();
+        chatAiService.updateLastChatActivity();
         System.out.println("Aggiornamento del timer inattività");
 
         //Controllo esistenza comando "!bot"
-        if(openAiService.openAiCheck(message.getContent())) {
+        if(chatAiService.openAiCheck(message.getContent())) {
+
+            //Aggiungo il messaggio a una lista conversazione che richiede l'API
+            List<OpenAiMessage> messaggio = new ArrayList<>(){};
+            messaggio.add(
+                    new OpenAiMessage(
+                            "user",
+                            message.getContent()
+                    )
+            );
+
             //avvio un thread secondario asincrono
             Executors.newSingleThreadExecutor().execute(() ->
-                    openAiService.newChatMessage(
+                    chatAiService.newChatMessage(
                             new ChatMessage(
-                                    message.getContent(),
+                                    chatAiService.sendApiRequest(messaggio),
                                     "OpenAiBot",
                                     MessageType.CHAT
                             )

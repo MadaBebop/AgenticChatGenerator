@@ -1,6 +1,6 @@
 package it.uniud.rmd.Config;
 
-import it.uniud.rmd.Service.OpenAiService;
+import it.uniud.rmd.Service.ChatAiService;
 import jakarta.annotation.PreDestroy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -11,18 +11,18 @@ import java.util.concurrent.ScheduledExecutorService;
 public class MyScheduledChattingTask{
 
 
-    private final OpenAiService openAiService;
+    private final ChatAiService chatAiService;
     private final ScheduledExecutorService scheduledExecutorService;
 
-    public MyScheduledChattingTask(OpenAiService openAiService, ScheduledExecutorService scheduledExecutorService) {
-        this.openAiService = openAiService;
+    public MyScheduledChattingTask(ChatAiService chatAiService, ScheduledExecutorService scheduledExecutorService) {
+        this.chatAiService = chatAiService;
         this.scheduledExecutorService = scheduledExecutorService;
     }
 
     @Scheduled(fixedDelay = 5000)
     public void myTask() {
-        if (openAiService.isChatInactive()) {
-            scheduledExecutorService.execute(openAiService::chattingBetweenBots);
+        if (chatAiService.isChatInactive()) {
+            scheduledExecutorService.execute(chatAiService::chattingBetweenBots);
         }
     }
 

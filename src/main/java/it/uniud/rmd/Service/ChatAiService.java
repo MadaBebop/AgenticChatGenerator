@@ -13,7 +13,7 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 @Service
-public class OpenAiService{
+public class ChatAiService {
 
     @Value("${openai.model}")
     private String model;
@@ -33,7 +33,7 @@ public class OpenAiService{
 
 
     //Costruttore
-    public OpenAiService(SimpMessagingTemplate messagingTemplate, RestTemplate restTemplate){
+    public ChatAiService(SimpMessagingTemplate messagingTemplate, RestTemplate restTemplate){
         //Templates V.
         this.messagingTemplate = messagingTemplate;
         this.restTemplate = restTemplate;
@@ -44,9 +44,9 @@ public class OpenAiService{
 
 
     public void chattingBetweenBots (){
-        //Genero il primo messaggio std (di Vortex) della conversazione
-        String botText = "Parlami di qualcosa a tuo piacere!";
-        String systemIndications = "Parla in maniera coincisa, senza ringraziare e portando avanti la conversazione";
+        //botText contiene alla partenza il primo messaggio della conversazione (di Vortex)
+        String botText = "Parlami di un argomento qualsiasi";
+        String systemIndications = "intrattieni una conversazione";
 
         //Creo il thread di Vortex
         List<OpenAiMessage> conversationVortex = new ArrayList<>();
@@ -59,10 +59,8 @@ public class OpenAiService{
         conversationPulsar.add(new OpenAiMessage("system", systemIndications));
         conversationPulsar.add(new OpenAiMessage("assistant", botText));
 
-
         //Check della conversazione
         boolean conversationAlternation = true;
-
 
         //Avvio il ciclo di conversazione
         while(isChatInactive()){
@@ -96,7 +94,7 @@ public class OpenAiService{
 
             //Awaits few secs
             try {
-                Thread.sleep(3000);
+                Thread.sleep(4000);
             }catch (InterruptedException ignored){
                 System.out.println("chattingBetweenBots IE error");
             }
@@ -122,10 +120,18 @@ public class OpenAiService{
 
     public String sendApiRequest(List<OpenAiMessage> conversation) {
 
+        double temperatura = temperature;
+
+        //Si ha un solo messaggio quando usiamo l'assistente AI
+        if(conversation.size() == 1){
+            //Vogliamo che la risposta sia il più deterministica possibile
+            temperatura = 0;
+        }
+
         OpenAiRequest request = new OpenAiRequest(
                 model,
                 conversation,
-                temperature
+                temperatura
         );
 
         try {
