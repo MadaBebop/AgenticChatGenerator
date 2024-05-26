@@ -120,18 +120,19 @@ public class ChatAiService {
 
     public String sendApiRequest(List<OpenAiMessage> conversation) {
 
-        double temperatura = temperature;
+        double temperaturaVoluta = temperature;
 
-        //Si ha un solo messaggio quando usiamo l'assistente AI
+        //Caso in cui si ha un solo messaggio (utilizzando l'assistente AI)
+        //Impostiamo la temperatura ad 0.
         if(conversation.size() == 1){
             //Vogliamo che la risposta sia il più deterministica possibile
-            temperatura = 0;
+            temperaturaVoluta = 0;
         }
 
         OpenAiRequest request = new OpenAiRequest(
                 model,
                 conversation,
-                temperatura
+                temperaturaVoluta
         );
 
         try {
@@ -146,11 +147,8 @@ public class ChatAiService {
                 return "Nessuna risposta, il bot potrebbe essere occupato :(";
             }
 
-            //Prendo una risposta a caso dalla List<Choice> choices
-            Random random = new Random();
-            int randomValue = random.nextInt(response.getChoices().size());
-            //Ritorno il messaggio generato dall'API
-            return response.getChoices().get(randomValue).getMessage().getContent();
+            //Ritorno il primo messaggio generato dall'API
+            return response.getChoices().get(0).getMessage().getContent();
 
         }catch(Exception e) {
             System.out.println("é stato impossibile accedere all'api");
